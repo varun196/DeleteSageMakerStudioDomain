@@ -19,7 +19,9 @@ if args.delete_all_domains_in_region is None and args.domain_id_list is None:
 sageMakerDomainObliviator = SageMakerDomainObliviator(args.region, args.endpoint_url)
 
 if args.delete_all_domains_in_region:
-    sageMakerDomainObliviator.delete_domains_with_dependencies(sageMakerDomainObliviator.list_all_domain_ids_in_region())
+    domain_ids = sageMakerDomainObliviator.list_all_domain_ids_in_region()
+    print(f'Will delete: {domain_ids}')
+    sageMakerDomainObliviator.delete_domains_with_dependencies(domain_ids)
 else:
     sageMakerDomainObliviator.delete_domains_with_dependencies(args.domain_id_list)
 

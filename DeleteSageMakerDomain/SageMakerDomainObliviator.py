@@ -18,7 +18,7 @@ class SageMakerDomainObliviator:
         for domain_id in domain_ids:
             self.delete_apps_blocking(self.list_apps(domain_id), domain_id)
             self.delete_user_profiles_blocking(self.list_user_profiles(domain_id), domain_id)
-            self.delete_domain()
+            self.delete_domain_blocking(domain_id)
 
     def list_all_domain_ids_in_region(self):
         domain_list = []
@@ -112,9 +112,20 @@ class SageMakerDomainObliviator:
             except self.sm_client.exceptions.ResourceNotFound as ex:
                 None
 
-    def delete_domain(self, domain_id: str):
+    def delete_domain_blocking(self, domain_id: str):
         try:
-            print(f"Deleting domain {self.domain_id}")
+            print(f"Deleting domain {domain_id}")
             self.sm_client.delete_domain(DomainId=domain_id, RetentionPolicy={'HomeEfsFileSystem': 'Delete'})
+            try:
+                while True:
+                    result = self.sm_client.describe_domain(DomainId=domain_id)
+                    if result["Status"] != "Deleting":
+                        print(f"Domain: {domain_id} is in status: {result['Status']}")
+                        break
+                    time.sleep(30)
+            except self.sm_client.exceptions.ResourceNotFound as ex:
+                print(f"Deleted domain: {domain_id}")
+                None
+
         except botocore.exceptions.ClientError as ex:
             print(f'Caught error: [{ex}]')

@@ -3,7 +3,8 @@ Simple wrapper to delete a SageMaker Studio Domain
 
 ## Usage
 
-Run `python3 delete_domain.py --domain-id <> --region <> [--endpoint-url <>]`
+Run `python3 delete_domain.py --help`
+
 
 ## Setup
 
